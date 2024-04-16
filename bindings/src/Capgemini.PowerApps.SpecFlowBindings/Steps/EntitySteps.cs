@@ -483,6 +483,26 @@
         }
 
         /// <summary>
+        /// Asserts that a section is visible.
+        /// </summary>
+        /// <param name="sectionName">The name of the section.</param>
+        [Then(@"I can see the '(.*)' section")]
+        public static void ThenICanSeeTheSection(string sectionName)
+        {
+            XrmApp.Entity.IsSectionVisible(Driver, sectionName).Should().BeTrue(because: "the section should be visible");
+        }
+
+        /// <summary>
+        /// Asserts that a section is not visible.
+        /// </summary>
+        /// <param name="sectionName">The name of the section.</param>
+        [Then(@"I can not see the '(.*)' section")]
+        public static void ThenICanNotSeeTheSection(string sectionName)
+        {
+            XrmApp.Entity.IsSectionVisible(Driver, sectionName).Should().BeFalse(because: "the section should be visible");
+        }
+
+        /// <summary>
         /// Asserts that a record is active or inactive.
         /// </summary>
         /// <param name="status">The status.</param>

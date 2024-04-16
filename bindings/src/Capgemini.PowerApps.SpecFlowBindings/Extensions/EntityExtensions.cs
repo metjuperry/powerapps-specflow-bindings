@@ -24,5 +24,22 @@
 
             return elements.Count > 0;
         }
+
+        /// <summary>
+        /// This is required as <see cref="Entity.GetField"/> throws a <see cref="NullReferenceException"/> when getting a hidden field.
+        /// </summary>
+        /// <param name="entity">The entity.</param>
+        /// <param name="driver">The Selenium WebDriver.</param>
+        /// <param name="sectionName">The name of the field.</param>
+        /// <returns>Whether the field is visible.</returns>
+        public static bool IsSectionVisible(this Entity entity, IWebDriver driver, string sectionName)
+        {
+            driver = driver ?? throw new ArgumentNullException(nameof(driver));
+
+            var elements = driver.FindElements(By.CssSelector($"*[data-id={sectionName}]"));
+
+            return elements.Count > 0;
+        }
+
     }
 }

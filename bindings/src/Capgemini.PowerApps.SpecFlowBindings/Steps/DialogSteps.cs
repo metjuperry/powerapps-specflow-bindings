@@ -1,6 +1,9 @@
 ﻿namespace Capgemini.PowerApps.SpecFlowBindings.Steps
 {
+    using FluentAssertions;
     using Microsoft.Dynamics365.UIAutomation.Api.UCI;
+    using Microsoft.Dynamics365.UIAutomation.Browser;
+    using OpenQA.Selenium;
     using TechTalk.SpecFlow;
 
     /// <summary>
@@ -67,6 +70,35 @@
         public static void WhenIClickOnThePublishDialog(string option)
         {
             XrmApp.Dialogs.PublishDialog(option == "confirm");
+        }
+
+        /// <summary>
+        /// Check if dialog is displayed.
+        /// </summary>
+        [Then(@"an alert dialog is displayed")]
+        public static void ThenAlertDialogIsDisplayed()
+        {
+            var dialog = Driver.FindElement(By.XPath("//div[@data-id='alertdialog']"));
+
+            dialog.Should().NotBeNull();
+        }
+
+        /// <summary>
+        /// Click a button on a custom dialog
+        /// </summary>
+        /// <param name="buttonName">The option to click.</param>
+        /// <param name="dialogName">Name of the dialog.</param>
+        [When(@"I click the '(.*)' button on the '(.*)' custom dialog")]
+        public static void WhenIClickButtonOnCustomDialog(string buttonName, string dialogName)
+        {
+            var dialog = Driver.FindElement(By.XPath($"//div[@role='dialog' and @data-id='{dialogName}']"));
+
+            var childButton = dialog.FindElement(By.XPath($".//button[@data-id='{buttonName}']"));
+
+            childButton.Click();
+
+            Driver.WaitForPageToLoad();
+            Driver.WaitForTransaction();
         }
 
         /// <summary>
