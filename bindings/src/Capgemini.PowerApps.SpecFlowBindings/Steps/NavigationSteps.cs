@@ -95,7 +95,6 @@
             Driver.WaitForTransaction();
         }
 
-
         /// <summary>
         /// Opens a quick create for an entity.
         /// </summary>

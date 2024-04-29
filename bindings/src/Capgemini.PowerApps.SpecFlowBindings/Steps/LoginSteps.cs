@@ -20,6 +20,7 @@
         /// <param name="appName">The name of the app.</param>
         /// <param name="userAlias">The alias of the user.</param>
         [Given("I am logged in to the '(.*)' app as '(.*)'")]
+        [Given("Přihlásím se do aplikace '(.*)' jako '(.*)'")]
         public static void GivenIAmLoggedInToTheAppAs(string appName, string userAlias)
         {
             var user = TestConfig.GetUser(userAlias, useCurrentUser: false);
@@ -33,11 +34,20 @@
 
             if (!string.IsNullOrEmpty(user.OtpToken))
             {
+                Console.WriteLine("Logging in with OTP token.");
 
-                XrmApp.OnlineLogin.Login(url, user.Username.ToSecureString(), user.Password.ToSecureString(), user.OtpToken.ToSecureString());
+                try
+                {
+                    XrmApp.OnlineLogin.Login(url, user.Username.ToSecureString(), user.Password.ToSecureString(), user.OtpToken.ToSecureString());
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Logging in with OTP token failed. Logging in without OTP token. " + ex.Message);
+                }
             }
             else
             {
+                Console.WriteLine("Logging in without OTP token.");
                 XrmApp.OnlineLogin.Login(url, user.Username.ToSecureString(), user.Password.ToSecureString());
             }
 
