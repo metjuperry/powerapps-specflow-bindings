@@ -89,7 +89,14 @@
         {
             var obj = (Dictionary<string, object>)this.ExecuteDriverFunction($"getRecordReference('{recordAlias}')");
 
-            return new EntityReference((string)obj["entityType"], Guid.Parse((string)obj["id"]));
+            var entityReferenceToReturn = new EntityReference((string)obj["entityType"], Guid.Parse((string)obj["id"]));
+
+            if (obj.ContainsKey("name"))
+            {
+                entityReferenceToReturn.Name = (string)obj["name"];
+            }
+
+            return entityReferenceToReturn;
         }
 
         private static string GetExecuteScriptForAsyncFunction(string functionCall)

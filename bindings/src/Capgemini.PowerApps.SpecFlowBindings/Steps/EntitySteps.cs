@@ -56,7 +56,7 @@
         /// <param name="fieldName">The field name.</param>
         /// <param name="fieldType">The field type.</param>
         /// <param name="fieldLocation">Whether the field is in the header.</param>
-        [When(@"I enter '(.*)' into the '(.*)' (text|optionset|multioptionset|boolean|numeric|currency|datetime|lookup) (field|header field) on the form")]
+        [When(@"I enter '(.*)' into the '(.*)' (text|optionset|multioptionset|boolean|numeric|currency|datetime|lookup|lookup@alias.bind) (field|header field) on the form")]
         public static void WhenIEnterInTheField(string fieldValue, string fieldName, string fieldType, string fieldLocation)
         {
             if (fieldLocation == "field")
@@ -533,6 +533,21 @@
                     {
                         Name = fieldName,
                         Value = fieldValue,
+                    });
+                    break;
+                case "lookup@alias.bind":
+
+                    var reference = TestDriver.GetTestRecordReference(fieldValue);
+
+                    if (reference == null || string.IsNullOrEmpty(reference.Name))
+                    {
+                        throw new InvalidOperationException($"The record with alias '{fieldValue}' does not exist.");
+                    }
+
+                    XrmApp.Entity.SetValue(new LookupItem()
+                    {
+                        Name = fieldName,
+                        Value = TestDriver.GetTestRecordReference(fieldValue).Name,
                     });
                     break;
                 case "currency":

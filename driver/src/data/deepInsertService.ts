@@ -44,6 +44,9 @@ export default class DeepInsertService {
     const recordToCreate = record;
     const associatedRecords: { alias?: string, reference: Xrm.LookupValue }[] = [];
 
+    // eslint-disable-next-line no-debugger
+    debugger;
+
     const aliasedRecordsByNavProp = DeepInsertService.getAliasedLookups(recordToCreate);
     await Promise.all(Object.keys(aliasedRecordsByNavProp).map(async (aliasedRecordNavProp) => {
       const alias = recordToCreate[aliasedRecordNavProp] as string;
@@ -69,7 +72,26 @@ export default class DeepInsertService {
     const collRecordsByNavProp = DeepInsertService.getOneToManyRecords(recordToCreate);
     Object.keys(collRecordsByNavProp).forEach((collNavProp) => delete recordToCreate[collNavProp]);
 
+    let bpfRecord = null;
+
+    if (recordToCreate['@bpf']) {
+      bpfRecord = recordToCreate['@bpf'] as Record;
+      delete recordToCreate['@bpf'];
+    }
+
     const recordToCreateRef = await repo.upsertRecord(logicalName, recordToCreate);
+
+    if (bpfRecord) {
+      const relBpf = await repo.retrieveRecord(recordToCreateRef.entityType, recordToCreateRef.id);
+
+      console.log('relBpf', relBpf);
+
+      await repo.upsertRecord(bpfRecord['@logicalName'] as string, bpfRecord);
+    }
+    const recordPrimaryName = await this.metadataRepository.getPrimaryNameForEntity(logicalName);
+    const createdRecord = await repo.retrieveRecord(logicalName, recordToCreateRef.id, `?$select=${recordPrimaryName}`);
+
+    recordToCreateRef.name = createdRecord[record[recordPrimaryName] as string];
 
     await Promise.all(Object.keys(collRecordsByNavProp).map(async (collNavProp) => {
       const result = await this.createCollectionRecords(
@@ -113,9 +135,9 @@ export default class DeepInsertService {
     return Object.keys(record)
       .filter(
         (key) => typeof record[key] === 'object'
-        && !Array.isArray(record[key])
-        && record[key] !== null
-        && !(record[key] instanceof Date),
+          && !Array.isArray(record[key])
+          && record[key] !== null
+          && !(record[key] instanceof Date),
       )
       .reduce((prev, curr) => {
         // eslint-disable-next-line no-param-reassign

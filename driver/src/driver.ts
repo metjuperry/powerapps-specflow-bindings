@@ -16,6 +16,8 @@ export default class Driver {
      * @memberof Driver
      */
   constructor(dataManager: DataManager) {
+    // eslint-disable-next-line no-debugger
+    debugger;
     this.dataManager = dataManager;
   }
 
@@ -27,6 +29,8 @@ export default class Driver {
      * @memberof Driver
      */
   public async loadTestData(json: string): Promise<Xrm.LookupValue> {
+    // eslint-disable-next-line no-debugger
+    debugger;
     const testRecord = JSON.parse(json) as TestRecord;
     const logicalName = testRecord['@logicalName'];
 
